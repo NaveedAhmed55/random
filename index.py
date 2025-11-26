@@ -9,8 +9,9 @@ import time
 
 # Load environment variables
 load_dotenv()
-USERNAME = os.getenv("USERNAME")
+USERNAME = os.getenv("u_name")
 PASSWORD = os.getenv("PASSWORD")
+
 
 def log(msg):
     print(msg, flush=True)
