@@ -42,7 +42,7 @@ jobs:
       - name: Run attendance script
         env:
           ACTION_TIME: ${{ github.event.schedule }}  # optional, can detect cron
-        run: python v.py
+        run: python index.py
 
       - name: Upload Screenshot Artifact
         if: always()
