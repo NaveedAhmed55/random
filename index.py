@@ -9,7 +9,7 @@ import time
 
 # Load environment variables
 load_dotenv()
-USERNAME = os.getenv("u_name")
+USERNAME = os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
 
 
@@ -94,3 +94,4 @@ try:
 finally:
     log("🏁 Script ended.")
     driver.quit()
+
