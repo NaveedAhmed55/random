@@ -32,8 +32,8 @@ jobs:
 
       - name: Run check-in script
         env:
-          RESOURCEINN_USERNAME: ${{ secrets.USERNAME }}
-          RESOURCEINN_PASSWORD: ${{ secrets.PASSWORD }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
           ACTION: "markCheckin"
           MAX_RANDOM_DELAY: "1800"   # random up to 1800s (30 minutes)
           HEADLESS: "true"
