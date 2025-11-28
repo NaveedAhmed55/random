@@ -1,17 +1,21 @@
-name: Attendance - Checkin
+name: Attendance - Auto Check-In & Check-Out
 
 on:
   schedule:
-    # Runs at 14:00 UTC every Monday–Friday → 19:00 PKT
-    - cron: '10 19 * * 1-5'
-  workflow_dispatch:
+    # Pakistan Time = UTC + 5
+    # Check-in window start: 9:00 AM PKT → 04:00 UTC
+    - cron: "0 4 * * 1-5"
+
+    # Check-out window start: 7:00 PM PKT → 14:00 UTC
+    - cron: "0 14 * * 1-5"
+  workflow_dispatch: {}
 
 jobs:
-  checkin:
+  attendance:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -21,34 +25,38 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip wget
-
-      - name: Install Google Chrome
-        run: |
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo apt install -y ./google-chrome-stable_current_amd64.deb
-
-      - name: Install Chromedriver
-        run: |
-          CHROME_VERSION=$(google-chrome --version | grep -oP "\d+\.\d+\.\d+")
-          DRIVER_VERSION=$(wget -qO- "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_${CHROME_VERSION%%.*}")
-          wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$DRIVER_VERSION/linux64/chromedriver-linux64.zip
-          unzip chromedriver-linux64.zip
-          sudo mv chromedriver-linux64/chromedriver /usr/bin/chromedriver
-          sudo chmod +x /usr/bin/chromedriver
-
-      - name: Install Python packages
-        run: |
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run check-in script
+      - name: Install Chromium + Chromedriver
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y chromium-browser chromium-chromedriver
+          echo "Chromium version:"
+          chromium-browser --version
+          echo "Chromedriver version:"
+          chromedriver --version
+
+      - name: Determine ACTION (Checkin or Checkout)
+        id: action_select
+        run: |
+          hour=$(date -u +"%H")
+
+          if [ "$hour" -eq "04" ]; then
+            echo "action=markCheckin" >> $GITHUB_OUTPUT
+          elif [ "$hour" -eq "14" ]; then
+            echo "action=markCheckout" >> $GITHUB_OUTPUT
+          else
+            echo "Invalid schedule hour! Exiting."
+            exit 1
+          fi
+
+      - name: Run Attendance Script
         env:
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
-          ACTION: "markCheckin"
-          MAX_RANDOM_DELAY: "1800"
+          ACTION: ${{ steps.action_select.outputs.action }}
+          MAX_RANDOM_DELAY: "1800"     # up to 30 minutes random delay
           HEADLESS: "true"
         run: |
           python index.py
