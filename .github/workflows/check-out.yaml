@@ -4,7 +4,7 @@ on:
   schedule:
     # Pakistan Time = UTC + 5
     # Check-in window start: 9:00 AM PKT → 04:00 UTC
-    - cron: "0 4 * * 1-5"
+    - cron: '20 3 * * 1-5'
 
     # Check-out window start: 7:00 PM PKT → 14:00 UTC
     - cron: "0 14 * * 1-5"
