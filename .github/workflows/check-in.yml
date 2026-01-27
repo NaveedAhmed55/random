@@ -3,7 +3,7 @@ name: Attendance - Checkin
 on:
   schedule:
     # Runs at 04:00 UTC every Monday-Friday -> PKT 09:00 (start of window)
-    - cron: '0 4 * * 1-5'
+     - cron: '20 3 * * 1-5'
   workflow_dispatch: {}
 
 jobs:
